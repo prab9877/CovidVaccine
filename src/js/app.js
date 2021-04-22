@@ -37,7 +37,7 @@ App = {
       App.contracts.VaccineControl.setProvider(App.web3Provider);
 
       App.listenForEvents();
-
+      App.showStats();
       return App.render();
     });
   },
@@ -74,92 +74,217 @@ App = {
       }
     });
 
-    // Load contract data
-    App.contracts.VaccineControl.deployed().then(function(instance) {
-      vaccinePerson = instance;
-      return vaccinePerson.getPerson();
-    }).then(function(person) {
-      console.log(person);
-      $("#firstNameInput").val(person[0]);
-      $("#lastNameInput").val(person[1]);
-
-    }).catch(function(error) {
-      console.warn(error);
-    });
-
-    vaccineList = [{1: "Measles"}, {2: "Flu"}, {3: "Tetanus"}]
-
-    vaccineList.forEach(function(dict, chave){
-      for (var key in dict) {
-        App.contracts.VaccineControl.deployed().then(function(instance) {
-          vaccinePerson = instance;
-          return vaccinePerson.getVaccine(key);
-        }).then(function(vaccine) {
-          var dose = vaccine[0]["c"][0];
-          var batch = vaccine[1];
-          var place = vaccine[2];
-
-          console.log(vaccine);
-          console.log(dose);
-          console.log(batch);
-          console.log(place);
-    
-          if (dose > 0) {
-            $("#span"+dict[key]).text("VACCINED");
-            $("#span"+dict[key]).attr("class", "label label-success");
-            $("#list"+dict[key]).attr("class", "list-group-item list-group-item-success");
-          }
-    
-          $("#lote"+dict[key]).text("Batch " + batch);
-          $("#dose"+dict[key]).text("Dose " + dose);
-          $("#place"+dict[key]).text(place);
-    
-        }).catch(function(error) {
-          console.warn(error);
-        });
-      }
-    });
-  },
-
+    },
   addPerson: function() {
-    console.log("New person adding...");
+    //clearing
+    document.myform.aadharNumberInput.style.borderColor="black";
+    document.myform.firstNameInput.style.borderColor="black";
+    document.myform.lastNameInput.style.borderColor="black";
+    document.myform.ageInput.style.borderColor="black";
+    document.myform.mobInput.style.borderColor="black";
+    document.myform.emailInput.style.borderColor="black";
 
+    console.log("New person adding...");
+    var adhar = $('#aadharNumberInput').val();
     var firstName = $('#firstNameInput').val();
     var lastName = $('#lastNameInput').val();
+    var age = $('#ageInput').val();
+    var mobile = $('#mobInput').val();
+    var email = $('#emailInput').val();
+    var vaccineName = document.querySelector(   
+      'input[name="vaccineType"]:checked').value;   
+    var dose = document.querySelector(   
+        'input[name="dose"]:checked').value;   
+    
 
     console.log(App.account);
+    
+    //Empty check
+    if(adhar==""){
+      alert("Adhar number is missing");
+      document.myform.aadharNumberInput.style.borderColor="red";
+      return false;
+    }
+    if(firstName==""){
+      alert("First Name is missing");
+      document.myform.firstNameInput.style.borderColor="red";
+      return false;
+    }
+    if(lastName==""){
+      alert("Last Name is missing");
+      document.myform.lastNameInput.style.borderColor="red";
+      return false;
+    }
+    if(age==""){
+      alert("Age is missing");
+      document.myform.ageInput.style.borderColor="red";
+      return false;
+    }
+    if(mobile==""){
+      alert("Mobile no. is missing");
+      document.myform.mobInput.style.borderColor="red";
+      return false;
+    }
+    if(email==""){
+      alert("Email id is missing");
+      document.myform.emailInput.style.borderColor="red";
+      return false;
+    }
 
-    App.contracts.VaccineControl.deployed().then(function(instance) {
-      return instance.addPerson(firstName, lastName, { from: App.account });
-    }).then(function(result) {
-      console.log("New person added.")
-      $("#alertPerson.alert").toggleClass('in'); 
-    }).catch(function(err) {
+    if(isNaN(adhar)){
+      alert("Adhar id should be numeric");
+      document.myform.aadharNumberInput.style.borderColor="red";
+      return false;
+
+    }
+    if(isNaN(age)){
+      alert("Age should be numeric");
+      document.myform.ageInput.style.borderColor="red";
+      return false;
+    }
+    if(isNaN(mobile)||mobile.length!=2){
+      alert("Invalid Mobile number");
+      document.myform.mobInput.style.borderColor="red";
+      return false;
+    }
+
+    const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if(!re.test(email)){
+      alert("Invalid Email id");
+      document.myform.emailInput.style.borderColor="red";
+      return false;
+    }
+
+    App.contracts.VaccineControl.deployed().then(function(instance){
+      return instance.getPerson(adhar,{from: App.account });
+    }).then(function(result){
+      console.log(result);
+      if(result[0]!="3"){
+          if(dose=="1"||result[0]=="2"){
+            alert("Adhar id already used!");
+            document.myform.aadharNumberInput.style.borderColor="red";
+            return false;
+        }
+        else{
+          if(result[1]!=vaccineName){
+            alert("Please give the patient the following vaccine for 2nd dose : "+result[1]);
+            return false;
+          }
+          App.contracts.VaccineControl.deployed().then(function(instance) {
+            return instance.updatePerson(adhar,{ from: App.account });
+          }).then(function(result){
+            App.showStats();
+            alert("2nd dose completed");
+            var templateParams = {
+              to_name: firstName+" "+lastName,
+              vaccine_name: vaccineName,
+              to_email: email,
+              dose : "2"
+            };
+
+            emailjs.send('service_n4h8vlq', 'template_xtz0kcd', templateParams)
+            .then(function(response) {
+              alert("Email sent successfully");
+              console.log('SUCCESS!', response.status, response.text);
+            }, function(error) {
+              console.log('FAILED...', error);
+            });
+
+            document.myform.reset(); 
+
+
+  
+
+          })
+          .catch(function(err){})
+        }
+      }
+      
+      else{
+        if(dose=="2"){
+          alert("1st dose still not completed");
+          return false;
+        }
+        App.contracts.VaccineControl.deployed().then(function(instance) {
+          return instance.addPerson(adhar,firstName, lastName,age,mobile,email,vaccineName ,{ from: App.account });
+        }).then(function(result) {
+          alert("New person added.");
+          App.showStats();
+          var templateParams = {
+            to_name: firstName+" "+lastName,
+            vaccine_name: vaccineName,
+            to_email: email,
+            dose: "1"
+          };
+
+          emailjs.send('service_n4h8vlq', 'template_xtz0kcd', templateParams)
+          .then(function(response) {
+            alert("Email sent successfully");
+            console.log('SUCCESS!', response.status, response.text);
+          }, function(error) {
+            console.log('FAILED...', error);
+          });
+
+          document.myform.reset(); 
+        }).catch(function(err) {
+          console.error(err);
+        });
+      }
+
+    }).catch(function(err){
       console.error(err);
-    });
+    })
+
+
+    
+
+    
   },
 
-  addVaccine: function() {
-    console.log("New vaccine adding...");
 
-    var id_vaccine = $('#VaccineSelect').val();
-    var dose = $('#DoseSelect').val();
-    var batch = $('#BatchInput').val();
-    var place = $('#PlaceInput').val();
 
-    App.contracts.VaccineControl.deployed().then(function(instance) {
-      return instance.addVaccine(id_vaccine, dose, batch, place, { from: App.account });
-    }).then(function(result) {
-      console.log("New vaccine added.")
-      $("#alertVaccine.alert").toggleClass('in'); 
-    }).catch(function(err) {
+  search: function() {
+    console.log("searching");
+    var adhar=$('#searchadhar').val();
+    App.contracts.VaccineControl.deployed().then(function(instance){
+      return instance.getPerson(adhar,{from: App.account });
+    }).then(function(result){
+      if(result[0]!="3"){
+        if(result[0]=="1"){
+          alert("Person is Vaccinated with 1 dose " );
+        }
+        else{
+          alert("Person is Vaccinated with 2 doses" );
+        }
+      }
+      else{
+        alert("Person is not vaccinated")
+      }
+    }).catch(function(err){
       console.error(err);
-    });
+    })
+  
+  },
+  showStats:function(){
+    App.contracts.VaccineControl.deployed().then(function(instance){
+      return instance.getStats({from: App.account });
+    }).then(function(result){
+     console.log(result);
+     document.getElementById("peoplecount").innerText=result[0];
+     document.getElementById("covaxincount").innerText=result[1];
+     document.getElementById("covishieldcount").innerText=result[2];
+    }).catch(function(err){
+      console.error(err);
+    })
   }
 };
 
 $(function() {
   $(window).load(function() {
     App.init();
+   
   });
+});
+$(function(){
+  emailjs.init("user_KpE0FbnXWSstpTKpyI7SD");
 });

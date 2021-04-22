@@ -3,82 +3,78 @@ pragma solidity >0.4.23;
 contract VaccineControl {
     
     event statusEvent(uint indexed statusCode);
-    
-    struct Person {
-        address personAddress;
+    struct Operator {
+        address operatorAddress;
         string firstName;
         string lastName;
-        bool created;
-        mapping(uint => Vaccine) vaccines;
+        
     }
 
-    struct Vaccine {
-        uint dose;
-        string batch;
-        string place;
+    struct Person {
+        string adhar;
+        string firstName;
+        string lastName;
+        
+        string age;
+        string mobile;
+        string email;
+        string vaccineName;
+        string dose;
     }
-
-    mapping (address => Person) private persons;
+    Person[] persons;
+    uint256 covishield=0;
+    uint256 covaxin=0;
+    uint256 personcount=0;
+    mapping (address => Operator) private operators;
     
-    function addPerson(string memory _firstName, string memory _lastName) public returns (bool) {
+    function addPerson(string memory _adhar,string memory _firstName, string memory _lastName,string memory _age,string memory _mobile,string memory _email,string memory _vaccineName) public returns (bool) {
         
         address _address = msg.sender;
         
-        Person storage person = persons[_address];
-        person.firstName = _firstName;
-        person.lastName = _lastName;
-        person.created = true;
+        
+        persons.push(Person(_adhar,_firstName,_lastName,_age,_mobile,_email,_vaccineName,"1"));
+        if((keccak256(abi.encodePacked(_vaccineName)))==(keccak256(abi.encodePacked("Covaxin"))))
+        covaxin++;
+        else
+        covishield++;
 
+        personcount++;
         emit statusEvent(100);
         
         return true;
     }
+    function updatePerson(string memory _adhar) public returns (bool) {
     
-    function getPerson() public view returns (string memory, string memory) {
-        address _address = msg.sender;
-        return (persons[_address].firstName, persons[_address].lastName);
-    }
-    
-    function getVaccine(uint _vaccineId) public view returns (uint, string memory, string memory) {
-        address _address = msg.sender;
-        return (persons[_address].vaccines[_vaccineId].dose, 
-        persons[_address].vaccines[_vaccineId].batch, persons[_address].vaccines[_vaccineId].place);
-    }
-    
-    function addVaccine(uint _vaccineId, uint _dose, string memory _batch, string memory _place) public 
-            returns(bool) 
-    {
-        address _address = msg.sender;
-
-        require(
-            _dose > 0,
-            "Dose is invalid."
-        );
-        
-        require(
-            bytes(_batch).length > 0,
-            "Batch is invalid."
-        );
-        
-        require(
-            bytes(_place).length > 0,
-            "Place of vaccine is invalid."
-        );
-        
-        if (persons[_address].created) {
-            Vaccine storage vaccine = persons[_address].vaccines[_vaccineId];
-            vaccine.dose = _dose;
-            vaccine.batch = _batch;
-            vaccine.place = _place;
-            persons[_address].vaccines[_vaccineId] = vaccine;
-   
-            emit statusEvent(101);
-        } 
-        else
-        {
-            emit statusEvent(400);
+        for(uint256 i;i<persons.length;i++){
+            if(keccak256(abi.encodePacked(persons[i].adhar)) ==keccak256(abi.encodePacked(_adhar))){    
+                persons[i].dose="2";
+                 if((keccak256(abi.encodePacked(persons[i].vaccineName)))==(keccak256(abi.encodePacked("Covaxin"))))
+                    covaxin++;
+                else
+                    covishield++;
+            }
         }
+        
+        
+        emit statusEvent(100);
+        
         return true;
     }
+    function getStats() public view returns ( uint256,uint256,uint256){
+        return (personcount,covaxin,covishield);
+    }
+
+    function getPerson(string memory _adhar) public view returns (string memory,string memory){
+        address _address =msg.sender;
+        
+        for(uint256 i;i<persons.length;i++){
+            if(keccak256(abi.encodePacked(persons[i].adhar)) ==keccak256(abi.encodePacked(_adhar)))return (persons[i].dose,persons[i].vaccineName);
+
+        }
+        
+        return ("3","null");
+    }
+    
+   
        
 }
