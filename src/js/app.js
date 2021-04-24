@@ -75,6 +75,25 @@ App = {
     });
 
     },
+    enableform:function(){
+      if(document.getElementById("two").checked){
+        document.myform.firstNameInput.disabled=true;
+        document.myform.lastNameInput.disabled=true;
+        document.myform.ageInput.disabled=true;
+        document.myform.mobInput.disabled=true;
+        document.myform.emailInput.disabled=true;
+      }
+      
+    },
+    disableform:function(){
+      if(document.getElementById("one").checked){
+        document.myform.firstNameInput.disabled=false;
+        document.myform.lastNameInput.disabled=false;
+        document.myform.ageInput.disabled=false;
+        document.myform.mobInput.disabled=false;
+        document.myform.emailInput.disabled=false;
+      }
+    },
   addPerson: function() {
     //clearing
     document.myform.aadharNumberInput.style.borderColor="black";
@@ -105,27 +124,27 @@ App = {
       document.myform.aadharNumberInput.style.borderColor="red";
       return false;
     }
-    if(firstName==""){
+    if(firstName==""&&dose!="2"){
       alert("First Name is missing");
       document.myform.firstNameInput.style.borderColor="red";
       return false;
     }
-    if(lastName==""){
+    if(lastName==""&&dose!="2"){
       alert("Last Name is missing");
       document.myform.lastNameInput.style.borderColor="red";
       return false;
     }
-    if(age==""){
+    if(age==""&&dose!="2"){
       alert("Age is missing");
       document.myform.ageInput.style.borderColor="red";
       return false;
     }
-    if(mobile==""){
+    if(mobile==""&&dose!="2"){
       alert("Mobile no. is missing");
       document.myform.mobInput.style.borderColor="red";
       return false;
     }
-    if(email==""){
+    if(email==""&&dose!="2"){
       alert("Email id is missing");
       document.myform.emailInput.style.borderColor="red";
       return false;
@@ -137,19 +156,19 @@ App = {
       return false;
 
     }
-    if(isNaN(age)){
+    if(isNaN(age)&&dose!="2"){
       alert("Age should be numeric");
       document.myform.ageInput.style.borderColor="red";
       return false;
     }
-    if(isNaN(mobile)||mobile.length!=2){
+    if((isNaN(mobile)||mobile.length!=10)&&dose!="2"){
       alert("Invalid Mobile number");
       document.myform.mobInput.style.borderColor="red";
       return false;
     }
 
     const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    if(!re.test(email)){
+    if(!re.test(email)&&dose!="2"){
       alert("Invalid Email id");
       document.myform.emailInput.style.borderColor="red";
       return false;

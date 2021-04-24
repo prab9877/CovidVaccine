@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Vaccine Chain</title>
+    <title>Vaccination Portal</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -19,36 +19,34 @@
     <![endif]-->
   </head>
   <body style="background-color: rgb(185, 233, 217);">
-    
-    <div class="container"  >
-      <div class="row"><h1 class="big-heading" class="text-center">Welcome to Covid-19 Vaccination portal</h1></div>
-      
-      <div class="row">
-        <div class="col-lg-4">
+    <div class="outer-div"  >
+      <div class="full-row">
+        <h1 class="big-heading" class="text-center">Welcome to Covid-19 Vaccination portal</h1>
+      </div>
+      <br>
+      <div class="left-div">
+        <div class="inner-div">
           <h1 class="">People Search</h1>
           <label for="searchadhar">Aadhar Number</label></br>
           <input type="text" id="searchadhar" ></br></br>
-    <button onClick="App.search();" class="btn btn-primary" >Search</button>
-    <br><br><br><br>
-    <h1 class="">Statstics</h1>
-    Total Number of people vaccinated : <span id="peoplecount"></span><br><br>
-    Covaxin used : <span id="covaxincount"></span><br><br>
-    Covishield used : <span id="covishieldcount"></span>
+          <button onClick="App.search();" class="btn btn-primary" >Search</button>
+        </div>
+        <div class="inner-div">
+          <h1 class="">Statstics</h1>
+          <div class="square">Total Number of people vaccinated <br> <span class="number" id="peoplecount"> </span></div>
+          <div class="square">Covaxin used <br><span class="number" id="covaxincount"></span></div>
+          <div class="square">Covishield used<br> <span class="number" id="covishieldcount"></span></div>
 
         </div>
-        <div class="col-lg-8">
-          
+      </div>
+      <div class="right-div">  
+        <div class="inner-div">
           <h1 class="text-center">Vaccine Registration</h1>
           <br/>
-          <div class="panel panel-default">
+          <div class="panel panel-default inner-div">
               <div class="panel-heading">
                 <h3 class="panel-title">Vaccine Card</h3>
               </div>
-              <div class="alert alert-success fade out" id="alertPerson">
-                  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                  <strong>Success!</strong> Person added or changed succesfully
-              </div>
-              <br/>
               <p id="accountAddress" class="text-center"></p>
               <div class="panel-body">
                   <form onSubmit="App.addPerson(); return false;" name="myform" autocomplete="off">
@@ -83,9 +81,9 @@
                       <label for="covishield">Covishield</label><br><br>
                 
                         <LABEL>Choose Dose</LABEL><BR>
-                          <input type="radio" id="one" name="dose" value="1" checked="true">
+                          <input type="radio" id="one" name="dose" value="1" checked="true" onChange="App.disableform();">
                           <label for="one">1st</label><br>
-                          <input type="radio" id="two" name="dose" value="2">
+                          <input type="radio" id="two" name="dose" value="2" onChange="App.enableform();">
                           <label for="two">2nd</label><br>
                       <button type="submit" class="btn btn-primary">Register</button>
                        
@@ -95,9 +93,9 @@
              
             </div>
             
-              </div>
-            <br/>
           </div>
+          
+        </div>
        
       
     </div>

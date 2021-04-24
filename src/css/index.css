@@ -1,0 +1,43 @@
+.left-div{
+    
+		color: #000;
+		height: 400px;
+		width: 30%;
+		float: left;
+        padding-top: 20px;
+}
+.right-div{
+  
+		color: #000;
+		height: 400px;
+		width: 68%;
+		float: right;
+        padding-top: 20px;
+}
+.outer-div{
+    background-color: #006699;
+		color: #fff;
+		height: 90%;
+		width: 90%;
+		margin: 0px auto;
+		padding: 5px;
+}
+.inner-div{
+    background-color: #b7eac4;
+    margin-left: 20px;
+    font-weight: bold;
+    font-family: arial
+}
+.square{
+    color:white;
+    background-color: #006699;
+    width: 180px;
+    height: 150px;
+    float: left;
+    padding:10px;
+    margin: 20px;
+}
+.number{
+    margin: 40px;
+    font-size: 60px;
+}
