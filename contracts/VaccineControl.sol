@@ -24,7 +24,8 @@ contract VaccineControl {
     Person[] persons;
     uint256 covishield=0;
     uint256 covaxin=0;
-    uint256 personcount=0;
+    uint256 onedosecount=0;
+    uint256 twodosecount=0;
     mapping (address => Operator) private operators;
     
     function addPerson(string memory _adhar,string memory _firstName, string memory _lastName,string memory _age,string memory _mobile,string memory _email,string memory _vaccineName) public returns (bool) {
@@ -38,7 +39,7 @@ contract VaccineControl {
         else
         covishield++;
 
-        personcount++;
+        onedosecount++;
         emit statusEvent(100);
         
         return true;
@@ -54,14 +55,15 @@ contract VaccineControl {
                     covishield++;
             }
         }
+        twodosecount++;
         
         
         emit statusEvent(100);
         
         return true;
     }
-    function getStats() public view returns ( uint256,uint256,uint256){
-        return (personcount,covaxin,covishield);
+    function getStats() public view returns ( uint256,uint256,uint256,uint256){
+        return (onedosecount,twodosecount,covaxin,covishield);
     }
 
     function getPerson(string memory _adhar) public view returns (string memory,string memory){

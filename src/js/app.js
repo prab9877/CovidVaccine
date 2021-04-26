@@ -210,6 +210,7 @@ App = {
             });
 
             document.myform.reset(); 
+            App.disableform();
 
 
   
@@ -245,6 +246,7 @@ App = {
           });
 
           document.myform.reset(); 
+          App.disableform();
         }).catch(function(err) {
           console.error(err);
         });
@@ -289,9 +291,10 @@ App = {
       return instance.getStats({from: App.account });
     }).then(function(result){
      console.log(result);
-     document.getElementById("peoplecount").innerText=result[0];
-     document.getElementById("covaxincount").innerText=result[1];
-     document.getElementById("covishieldcount").innerText=result[2];
+     document.getElementById("onedosecount").innerText=result[0];
+     document.getElementById("twodosecount").innerText=result[1];
+     document.getElementById("covaxincount").innerText=result[2];
+     document.getElementById("covishieldcount").innerText=result[3];
     }).catch(function(err){
       console.error(err);
     })
